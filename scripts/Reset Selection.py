@@ -32,9 +32,9 @@ def main():
 	if len(keyGroups) > 0:
 		for keys in keyGroups:
 			resetSelection(keys)
-	
-	c4d.EventAdd(c4d.MSG_UPDATE)
+			
 	doc.EndUndo()
+	c4d.EventAdd()
 
 if __name__=='__main__':
 	main()

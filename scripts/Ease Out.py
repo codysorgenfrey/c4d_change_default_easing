@@ -10,6 +10,54 @@ Description-US: Set the easing of the selected keyframes to the cubic-bezier val
 import c4d
 from ChangeDefaultEasing.common import *
 
+def easeOutKeys(keys, easing):
+	x = 0
+	count = len(keys)
+	while x < (count-1):
+		firstKey = keys[x][0]
+		secondKey = keys[x+1][0]
+		
+		minVal = firstKey.GetValue()
+		minTime = firstKey.GetTime().Get()
+	
+		maxVal = secondKey.GetValue()
+		maxTime = secondKey.GetTime().Get()
+					
+		firstKeyRVal = 0
+		firstKeyRTime = ((maxTime-minTime) * easing) * .75
+		
+		lastKeyLVal = 0
+		lastKeyLTime = 0
+				
+		firstKey.SetInterpolation(firstKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
+		secondKey.SetInterpolation(secondKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
+		
+		firstKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
+		secondKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
+		
+		firstKey.SetValueRight(firstKey.GetCurve(), firstKeyRVal)
+		firstKey.SetTimeRight(firstKey.GetCurve(), c4d.BaseTime(firstKeyRTime))
+		
+		secondKey.SetValueLeft(secondKey.GetCurve(), lastKeyLVal)
+		secondKey.SetTimeLeft(secondKey.GetCurve(), c4d.BaseTime(lastKeyLTime))
+		
+		x += 1		
+
 def main():
 	doc.StartUndo()
 	
@@ -38,8 +86,8 @@ def main():
 			resetSelection(keys)
 			easeOutKeys(keys, easing[2])
 	
-	c4d.EventAdd(c4d.MSG_UPDATE)
 	doc.EndUndo()
+	c4d.EventAdd()
 
 if __name__=='__main__':
 	main()

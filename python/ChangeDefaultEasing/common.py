@@ -1,6 +1,8 @@
 import c4d, os
 from c4d import gui, storage as st
 
+g_pluginID = 1051473
+
 class ObjectIterator:
 	def __init__(self, baseObject):
 		self.baseObject = baseObject
@@ -117,182 +119,17 @@ def findSelectedKeys(obj, keyGroups):
 				keyGroups.append(keys)
 			track = track.GetNext()
 
-def easeOutKeys(keys, easing):
-	x = 0
-	count = len(keys)
-	while x < (count - 1):
-		firstKey = keys[x][0]
-		secondKey = keys[x+1][0]
-		
-		minVal = firstKey.GetValue()
-		minTime = firstKey.GetTime().Get()
-	
-		maxVal = secondKey.GetValue()
-		maxTime = secondKey.GetTime().Get()
-					
-		firstKeyRVal = ((maxVal-minVal)*.75) * easing
-		firstKeyRTime = 0
-		
-		lastKeyLVal = 0
-		lastKeyLTime = (-1*((maxTime-minTime)*.75)) * easing
-		
-		firstKey.SetInterpolation(firstKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		secondKey.SetInterpolation(secondKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.SetValueRight(firstKey.GetCurve(), firstKeyRVal)
-		firstKey.SetTimeRight(firstKey.GetCurve(), c4d.BaseTime(firstKeyRTime))
-		
-		secondKey.SetValueLeft(secondKey.GetCurve(), lastKeyLVal)
-		secondKey.SetTimeLeft(secondKey.GetCurve(), c4d.BaseTime(lastKeyLTime))
-		
-		x += 1
-
-def easeInKeys(keys, easing):
-	x = 0
-	count = len(keys)
-	while x < (count-1):
-		firstKey = keys[x][0]
-		secondKey = keys[x+1][0]
-		
-		minVal = firstKey.GetValue()
-		minTime = firstKey.GetTime().Get()
-	
-		maxVal = secondKey.GetValue()
-		maxTime = secondKey.GetTime().Get()
-					
-		firstKeyRVal = 0
-		firstKeyRTime = ((maxTime-minTime)*.75) * easing
-		
-		lastKeyLVal = (-1*((maxVal-minVal)*.75)) * easing
-		lastKeyLTime = 0
-				
-		firstKey.SetInterpolation(firstKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		secondKey.SetInterpolation(secondKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.SetValueRight(firstKey.GetCurve(), firstKeyRVal)
-		firstKey.SetTimeRight(firstKey.GetCurve(), c4d.BaseTime(firstKeyRTime))
-		
-		secondKey.SetValueLeft(secondKey.GetCurve(), lastKeyLVal)
-		secondKey.SetTimeLeft(secondKey.GetCurve(), c4d.BaseTime(lastKeyLTime))
-		
-		x += 1		
-		
-def easyEaseKeys(keys, easing):
-	x = 0
-	count = len(keys)
-	while x < (count-1):
-		firstKey = keys[x][0]
-		secondKey = keys[x+1][0]
-		
-		minVal = firstKey.GetValue()
-		minTime = firstKey.GetTime().Get()
-	
-		maxVal = secondKey.GetValue()
-		maxTime = secondKey.GetTime().Get()
-					
-		firstKeyRVal = 0
-		firstKeyRTime = ((maxTime-minTime)*.75) * easing
-		
-		lastKeyLVal = 0
-		lastKeyLTime =  (-1*((maxTime-minTime)*.75)) * easing
-		
-		if easing > .75:
-			midVal = minVal + (maxVal-minVal)/2
-			midTime = minTime+((maxTime - minTime)/2)
-			midKeyLVal = (-1*((maxVal-minVal)*.2)) * easing
-			midKeyLTime = 0
-			midKeyRVal = ((maxVal-minVal)*.2) * easing
-			midKeyRTime = 0
-		
-			newKey = firstKey.GetCurve().AddKey(c4d.BaseTime(midTime))
-			newKey["key"].SetValue(newKey["key"].GetCurve(), midVal)
-			newKey["key"].SetInterpolation(newKey["key"].GetCurve(), c4d.CINTERPOLATION_SPLINE)
-			newKey["key"].ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-			newKey["key"].SetValueLeft(newKey["key"].GetCurve(), midKeyLVal)
-			newKey["key"].SetTimeLeft(newKey["key"].GetCurve(), c4d.BaseTime(midKeyLTime))
-			newKey["key"].SetValueRight(newKey["key"].GetCurve(), midKeyRVal)
-			newKey["key"].SetTimeRight(newKey["key"].GetCurve(), c4d.BaseTime(midKeyRTime))
-			
-			firstKeyRTime = firstKeyRTime * .5
-			lastKeyLTime = lastKeyLTime * .5
-		
-		firstKey.SetInterpolation(firstKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		secondKey.SetInterpolation(secondKey.GetCurve(), c4d.CINTERPOLATION_SPLINE)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_BREAK, c4d.NBITCONTROL_SET)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_AUTO, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_O, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_LOCK_L, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_REMOVEOVERSHOOT, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		secondKey.ChangeNBit(c4d.NBIT_CKEY_CLAMP, c4d.NBITCONTROL_CLEAR)
-		
-		firstKey.SetValueRight(firstKey.GetCurve(), firstKeyRVal)
-		firstKey.SetTimeRight(firstKey.GetCurve(), c4d.BaseTime(firstKeyRTime))
-		
-		secondKey.SetValueLeft(secondKey.GetCurve(), lastKeyLVal)
-		secondKey.SetTimeLeft(secondKey.GetCurve(), c4d.BaseTime(lastKeyLTime))
-		
-		x += 1
-
 def resetSelection(keys):
-	keys.reverse()
 	x = 0
-	while x < (len(keys)-1):
-		firstKey = keys[x]
+	while x < len(keys):
+		if keys[x][0].GetNBit(c4d.NBIT_CKEY_BREAKDOWNCOLOR):
+			keyTime = keys[x][0].GetTime()
+			keyCurve = keys[x][0].GetCurve()
+			keyID = keyCurve.FindKey(keyTime)["idx"]
+			keyCurve.DelKey(keyID)
+			del keys[x]
+		else:
+			keys[x][0].SetInterpolation(keys[x][0].GetCurve(), c4d.CINTERPOLATION_LINEAR)
+
 		x += 1
-		lastKey = keys[x]
-		if (firstKey[1]-1) != lastKey[1]:
-			middleKey = firstKey[0].GetCurve().GetKey(firstKey[1]-1)
-			timeSearch = middleKey.GetCurve().FindKey(middleKey.GetTime())
-			middleKey.GetCurve().DelKey(timeSearch["idx"])
-		
-		firstKey[0].SetInterpolation(firstKey[0].GetCurve(), c4d.CINTERPOLATION_LINEAR)
-		lastKey[0].SetInterpolation(lastKey[0].GetCurve(), c4d.CINTERPOLATION_LINEAR)
-	keys.reverse()
+	c4d.EventAdd()
